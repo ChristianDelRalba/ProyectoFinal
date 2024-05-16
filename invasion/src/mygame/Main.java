@@ -51,8 +51,11 @@ public class Main extends SimpleApplication {
         Box smallBox = new Box(1, 1, 1);
         movingBox = new Geometry("SmallBox", smallBox);
         Material smallMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        smallMat.setColor("Color", ColorRGBA.Blue);
+        //smallMat.setColor("Color", ColorRGBA.Blue);
         movingBox.setMaterial(smallMat);
+        Texture cubeTex = assetManager.loadTexture("Textures/terra.jpg");
+        smallMat.setTexture("ColorMap", cubeTex);
+
 
         
         movingBox.setLocalTranslation(new Vector3f(0, 1, 0)); 
