@@ -10,6 +10,7 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
 
@@ -57,11 +58,26 @@ public class Main extends SimpleApplication {
         cam.setLocation(new Vector3f(0, 20, 20));
         cam.lookAt(movingBox.getLocalTranslation(), Vector3f.UNIT_Y);
         flyCam.setEnabled(false);
-
         
+
+        //
+        //carga de modelo
+        Spatial model = assetManager.loadModel("Models/rocket/rocket.j3o");
+        
+        // Ajusta la posición, rotación y escala del modelo si es necesario
+        model.setLocalTranslation(0, 0, 0);
+        model.setLocalScale(10f);
+
+        // Añade el modelo a la escena principal
+        rootNode.attachChild(model);
+
         createBoundaries();
 
         setupKeys();
+        
+        
+        
+        
     }
 
     private void createBoundaries() {
