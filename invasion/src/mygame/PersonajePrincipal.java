@@ -15,12 +15,14 @@ public class PersonajePrincipal extends Main {
     private Geometry movingBox;
     private final Vector3f movementDirection = new Vector3f(0, 0, 0);
     private final float moveSpeed = 5f;
+    private Enemigos enemigos;
 
     @Override
     public void simpleInitApp() {
         super.simpleInitApp(); // Llamar al método de inicialización de la clase principal
         addMainCharacter();
         setupKeys();
+        enemigos = new Enemigos(this);
     }
 
     private void addMainCharacter() {
@@ -78,5 +80,7 @@ public class PersonajePrincipal extends Main {
         Vector3f camPosition = movingBox.getLocalTranslation().add(10 * FastMath.cos(FastMath.PI / 6), 10, 10 * FastMath.sin(FastMath.PI / 6));
         cam.setLocation(camPosition);
         cam.lookAt(movingBox.getLocalTranslation(), Vector3f.UNIT_Y);
+
+        enemigos.update(tpf, movingBox.getLocalTranslation());
     }
 }

@@ -4,7 +4,6 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
-import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
@@ -52,36 +51,6 @@ public class Main extends SimpleApplication {
 
     private void createBoundaries() {
         float blockSize = 1.0f;
-        Box boundaryBox = new Box(blockSize / 2, blockSize / 2, blockSize / 2);
-
-        Material boundaryMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        try {
-            Texture boundaryTex = assetManager.loadTexture("Textures/barrera.jpg");
-            boundaryMat.setTexture("ColorMap", boundaryTex);
-        } catch (Exception e) {
-            System.out.println("Error loading texture: " + e.getMessage());
-            boundaryMat.setColor("Color", ColorRGBA.Gray);
-        }
-
-        for (float i = -floorSize / 2; i <= floorSize / 2; i += blockSize) {
-            for (float j = -floorSize / 2; j <= floorSize / 2; j += blockSize) {
-                if (i == -floorSize / 2 || i == floorSize / 2 || j == -floorSize / 2 || j == floorSize / 2) {
-                    Geometry boundaryGeom = new Geometry("Boundary", boundaryBox);
-                    boundaryGeom.setMaterial(boundaryMat);
-                    boundaryGeom.setLocalTranslation(i, 0.5f, j);
-                    rootNode.attachChild(boundaryGeom);
-                }
-            }
-        }
-    }
-
-    @Override
-    public void simpleUpdate(float tpf) {
-        // Actualizaciones generales
-    }
-
-    @Override
-    public void simpleRender(RenderManager rm) {
-        // TODO: add render code
+       
     }
 }
