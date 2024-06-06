@@ -7,10 +7,10 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
-import com.jme3.texture.Texture;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
+import com.jme3.texture.Texture;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +19,7 @@ public class PersonajePrincipal extends Main {
 
     private Geometry movingBox;
     private final Vector3f movementDirection = new Vector3f(0, 0, 0);
+    private final Vector3f shootingDirection = new Vector3f(0, 0, 1);
     private final float moveSpeed = 5f;
     private Enemigos enemigos;
     private List<Geometry> proyectiles;
@@ -27,7 +28,7 @@ public class PersonajePrincipal extends Main {
 
     @Override
     public void simpleInitApp() {
-        super.simpleInitApp(); // Llamar al método de inicialización de la clase principal
+        super.simpleInitApp();
         addMainCharacter();
         setupKeys();
         enemigos = new Enemigos(this);
@@ -36,13 +37,13 @@ public class PersonajePrincipal extends Main {
     }
 
     private void addMainCharacter() {
+        // Agrega el personaje principal a la escena
         Box smallBox = new Box(0.5f, 0.5f, 0.5f);
         movingBox = new Geometry("SmallBox", smallBox);
         Material smallMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         Texture cubeTex = assetManager.loadTexture("Textures/terra.jpg");
         smallMat.setTexture("ColorMap", cubeTex);
         movingBox.setMaterial(smallMat);
-        // Colocando en una orilla del piso
         movingBox.setLocalTranslation(new Vector3f(-floorSize / 2 + 0.5f, 1, -floorSize / 2 + 0.5f));
         rootNode.attachChild(movingBox);
 
@@ -53,17 +54,23 @@ public class PersonajePrincipal extends Main {
     }
 
     private void setupKeys() {
+        // Configura las teclas para el movimiento y el disparo
         inputManager.addMapping("MoveLeft", new KeyTrigger(KeyInput.KEY_W));
         inputManager.addMapping("MoveRight", new KeyTrigger(KeyInput.KEY_S));
         inputManager.addMapping("MoveUp", new KeyTrigger(KeyInput.KEY_D));
         inputManager.addMapping("MoveDown", new KeyTrigger(KeyInput.KEY_A));
         inputManager.addMapping("Shoot", new KeyTrigger(KeyInput.KEY_SPACE));
+        inputManager.addMapping("ShootLeft", new KeyTrigger(KeyInput.KEY_UP));
+        inputManager.addMapping("ShootRight", new KeyTrigger(KeyInput.KEY_DOWN));
+        inputManager.addMapping("ShootUp", new KeyTrigger(KeyInput.KEY_LEFT));
+        inputManager.addMapping("ShootDown", new KeyTrigger(KeyInput.KEY_RIGHT));
 
-        inputManager.addListener(actionListener, "MoveLeft", "MoveRight", "MoveUp", "MoveDown", "Shoot");
+        inputManager.addListener(actionListener, "MoveLeft", "MoveRight", "MoveUp", "MoveDown", "Shoot", "ShootLeft", "ShootRight", "ShootUp", "ShootDown");
     }
 
     private final ActionListener actionListener = new ActionListener() {
         public void onAction(String name, boolean isPressed, float tpf) {
+            // Movimiento del personaje
             if (name.equals("MoveLeft")) {
                 movementDirection.x = isPressed ? -1 : 0;
             } else if (name.equals("MoveRight")) {
@@ -74,29 +81,39 @@ public class PersonajePrincipal extends Main {
                 movementDirection.z = isPressed ? 1 : 0;
             } else if (name.equals("Shoot") && isPressed) {
                 shoot();
+            } else if (name.equals("ShootLeft")) {
+                shootingDirection.set(-1, 0, 0);
+            } else if (name.equals("ShootRight")) {
+                shootingDirection.set(1, 0, 0);
+            } else if (name.equals("ShootUp")) {
+                shootingDirection.set(0, 0, -1);
+            } else if (name.equals("ShootDown")) {
+                shootingDirection.set(0, 0, 1);
             }
         }
     };
 
     private void shoot() {
+        // Crea un nuevo proyectil y lo dispara en la dirección actual
         Sphere sphere = new Sphere(8, 8, 0.2f);
         Geometry proyectil = new Geometry("Proyectil", sphere);
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.setColor("Color", ColorRGBA.Yellow);
         proyectil.setMaterial(mat);
 
-        Vector3f position = movingBox.getLocalTranslation();
+        Vector3f position = movingBox.getLocalTranslation().clone();
         proyectil.setLocalTranslation(position);
 
         rootNode.attachChild(proyectil);
         proyectiles.add(proyectil);
-        disparosActivos.add(new Disparo(proyectil, movementDirection.clone()));
+        disparosActivos.add(new Disparo(proyectil, shootingDirection.clone()));
     }
 
     @Override
     public void simpleUpdate(float tpf) {
-        super.simpleUpdate(tpf); // Llamar al método de actualización de la clase principal
+        super.simpleUpdate(tpf);
 
+        // Actualiza la posición del personaje
         Vector3f translation = movingBox.getLocalTranslation();
         Vector3f newTranslation = translation.add(movementDirection.mult(tpf * moveSpeed));
 
@@ -105,6 +122,7 @@ public class PersonajePrincipal extends Main {
             movingBox.setLocalTranslation(newTranslation);
         }
 
+        // Actualiza la posición de la cámara
         Vector3f camPosition = movingBox.getLocalTranslation().add(10 * FastMath.cos(FastMath.PI / 6), 10, 10 * FastMath.sin(FastMath.PI / 6));
         cam.setLocation(camPosition);
         cam.lookAt(movingBox.getLocalTranslation(), Vector3f.UNIT_Y);
@@ -114,6 +132,7 @@ public class PersonajePrincipal extends Main {
     }
 
     private void updateProyectiles(float tpf) {
+        // Actualiza la posición de los proyectiles y verifica colisiones
         Iterator<Disparo> iter = disparosActivos.iterator();
         while (iter.hasNext()) {
             Disparo disparo = iter.next();

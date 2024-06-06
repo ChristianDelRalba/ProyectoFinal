@@ -37,12 +37,14 @@ public class Enemigos {
     }
 
     public void update(float tpf, Vector3f playerPosition) {
+        // Controla la aparición de nuevos enemigos
         timeSinceLastSpawn += tpf;
         if (timeSinceLastSpawn >= spawnInterval && enemigos.size() < maxEnemigos) {
             spawnEnemigo();
             timeSinceLastSpawn = 0f;
         }
 
+        // Actualiza la posición de los enemigos para que se muevan hacia el jugador
         for (Geometry enemigo : enemigos) {
             Vector3f direction = playerPosition.subtract(enemigo.getLocalTranslation()).normalize();
             enemigo.move(direction.mult(tpf * 2f)); // Velocidad del enemigo
@@ -50,6 +52,7 @@ public class Enemigos {
     }
 
     private void spawnEnemigo() {
+        // Crea un nuevo enemigo
         Sphere sphere = new Sphere(16, 16, 0.5f);
         Geometry enemigo = new Geometry("Enemigo", sphere);
         Material mat = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
@@ -74,9 +77,11 @@ public class Enemigos {
     }
 
     public void hitEnemigo(Geometry enemigo) {
+        // Maneja el impacto de un enemigo
         int impactos = impactosEnemigos.getOrDefault(enemigo, 0);
         impactos++;
         if (impactos >= 3) {
+            // Si el enemigo ha sido golpeado 3 veces, se elimina
             app.getRootNode().detachChild(enemigo);
             enemigos.remove(enemigo);
             impactosEnemigos.remove(enemigo);
