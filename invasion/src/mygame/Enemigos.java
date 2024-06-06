@@ -7,7 +7,9 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class Enemigos {
@@ -19,6 +21,7 @@ public class Enemigos {
     private float timeSinceLastSpawn = 0f;
     private final int maxEnemigos = 5;
     private final Vector3f[] spawnPositions;
+    private final Map<Geometry, Integer> impactosEnemigos;
 
     public Enemigos(Main app) {
         this.app = app;
@@ -30,6 +33,7 @@ public class Enemigos {
             new Vector3f(-app.floorSize / 2, 0.5f, app.floorSize / 2),
             new Vector3f(app.floorSize / 2, 0.5f, app.floorSize / 2)
         };
+        this.impactosEnemigos = new HashMap<>();
     }
 
     public void update(float tpf, Vector3f playerPosition) {
@@ -62,5 +66,22 @@ public class Enemigos {
         enemigo.setLocalTranslation(spawnPosition);
         app.getRootNode().attachChild(enemigo);
         enemigos.add(enemigo);
+        impactosEnemigos.put(enemigo, 0);
+    }
+
+    public List<Geometry> getEnemigos() {
+        return enemigos;
+    }
+
+    public void hitEnemigo(Geometry enemigo) {
+        int impactos = impactosEnemigos.getOrDefault(enemigo, 0);
+        impactos++;
+        if (impactos >= 3) {
+            app.getRootNode().detachChild(enemigo);
+            enemigos.remove(enemigo);
+            impactosEnemigos.remove(enemigo);
+        } else {
+            impactosEnemigos.put(enemigo, impactos);
+        }
     }
 }
