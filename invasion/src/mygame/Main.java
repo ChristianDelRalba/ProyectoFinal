@@ -12,15 +12,23 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
+import com.jme3.system.AppSettings;
+import com.jme3.light.DirectionalLight;
 
 public class Main extends SimpleApplication {
 
     protected final float floorSize = 25f;
     private BitmapText hudText;
     protected int enemiesEliminated = 0;
+    
+    
 
     public static void main(String[] args) {
         PersonajePrincipal app = new PersonajePrincipal();
+        AppSettings settings = new AppSettings(true);
+        settings.setTitle("Invasion");
+        settings.setSettingsDialogImage("Textures/imagenInicio.png");
+        app.setSettings(settings);
         app.start();
     }
 
@@ -30,6 +38,11 @@ public class Main extends SimpleApplication {
         createBoundaries();
         addModel();
         initHUD();
+        
+        DirectionalLight sun = new DirectionalLight();
+        sun.setDirection(new Vector3f(0f, -90f, -65)); 
+        sun.setColor(ColorRGBA.White);
+        rootNode.addLight(sun);
     }
 
     private void createFloor() {
@@ -73,6 +86,8 @@ public class Main extends SimpleApplication {
             }
         }
     }
+    
+    
 
     private void addModel() {
         // Carga de modelo
@@ -108,9 +123,23 @@ public class Main extends SimpleApplication {
         if (enemiesEliminated > 50) {
             hudText.setText("RESUMEN DEL JUEGO");
             hudText.setText("FIN DEL JUEGO\nEnemigos eliminados: " + enemiesEliminated);
-            stop();
+            //stop();
         }
     }
+    
+    /*
+    private void loadAndPlayMusic() {
+        // Cargar el archivo de audio 
+        audio = new AudioNode(assetManager, "Sounds/AquaSong.wav", DataType.Stream);
+        audio.setLooping(true); // Para que la música se repita
+        audio.setPositional(false);
+        audio.setVolume(8); // Ajusta el volumen
+
+        // Adjuntar el nodo de audio al nodo raíz
+        rootNode.attachChild(audio);
+        audio.play();
+    }
+    */
 
     @Override
     public void simpleUpdate(float tpf) {
@@ -120,7 +149,9 @@ public class Main extends SimpleApplication {
 
     @Override
     public void simpleRender(RenderManager rm) {
-        // Código de renderización, si es necesario
+        // Código de renderización
     }
+    
+    
 }
 
