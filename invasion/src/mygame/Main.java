@@ -1,7 +1,9 @@
 package mygame;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
+import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
@@ -14,8 +16,8 @@ import com.jme3.texture.Texture;
 public class Main extends SimpleApplication {
 
     protected final float floorSize = 25f;
-    protected BitmapText hudText; // Texto para el contador de enemigos eliminados
-    protected int enemiesEliminated = 0; // Contador de enemigos eliminados
+    private BitmapText hudText;
+    protected int enemiesEliminated = 0;
 
     public static void main(String[] args) {
         PersonajePrincipal app = new PersonajePrincipal();
@@ -31,7 +33,6 @@ public class Main extends SimpleApplication {
     }
 
     private void createFloor() {
-        // Crea el piso de la escena
         Box floorBox = new Box(floorSize / 2, 0.1f, floorSize / 2);
         Geometry floorGeom = new Geometry("Floor", floorBox);
 
@@ -49,7 +50,6 @@ public class Main extends SimpleApplication {
     }
 
     private void createBoundaries() {
-        // Crea las paredes que limitan la escena
         float blockSize = 1.0f;
         Box boundaryBox = new Box(blockSize / 2, blockSize / 2, blockSize / 2);
 
@@ -75,10 +75,14 @@ public class Main extends SimpleApplication {
     }
 
     private void addModel() {
-        // Carga un modelo en la escena
+        // Carga de modelo
         Spatial model = assetManager.loadModel("Models/rocket/rocket.j3o");
+
+        // Ajusta la posición, rotación y escala del modelo si es necesario
         model.setLocalTranslation(0, 0, 0);
         model.setLocalScale(10f);
+
+        // Añade el modelo a la escena principal
         rootNode.attachChild(model);
     }
 
@@ -90,36 +94,33 @@ public class Main extends SimpleApplication {
         hudText.setSize(guiFont.getCharSet().getRenderedSize());
         hudText.setColor(ColorRGBA.White);
         hudText.setText("Enemigos eliminados: 0");
-        hudText.setLocalTranslation(10, settings.getHeight() - hudText.getLineHeight(), 0);
+        hudText.setLocalTranslation(10, settings.getHeight() - 10, 0);
         guiNode.attachChild(hudText);
     }
 
     public void updateHUD() {
-        // Actualiza el texto del HUD
+        // Actualiza el texto del HUD con el número de enemigos eliminados
         hudText.setText("Enemigos eliminados: " + enemiesEliminated);
     }
 
     public void checkGameOver() {
         // Verifica si el juego ha terminado
-        if (enemiesEliminated > 30) {
-            BitmapText gameOverText = new BitmapText(guiFont, false);
-            gameOverText.setSize(guiFont.getCharSet().getRenderedSize() * 2);
-            gameOverText.setColor(ColorRGBA.Red);
-            gameOverText.setText("FIN DEL JUEGO. Enemigos eliminados: " + enemiesEliminated);
-            gameOverText.setLocalTranslation(settings.getWidth() / 2 - gameOverText.getLineWidth() / 2,
-                    settings.getHeight() / 2 + gameOverText.getLineHeight() / 2, 0);
-            guiNode.attachChild(gameOverText);
+        if (enemiesEliminated > 50) {
+            hudText.setText("RESUMEN DEL JUEGO");
+            hudText.setText("FIN DEL JUEGO\nEnemigos eliminados: " + enemiesEliminated);
             stop();
         }
     }
 
     @Override
     public void simpleUpdate(float tpf) {
-        // Actualización del juego, manejado en PersonajePrincipal
+        // El método simpleUpdate ahora está vacío, ya que la lógica específica
+        // del juego (movimiento del personaje principal y enemigos) se maneja en PersonajePrincipal.
     }
 
     @Override
     public void simpleRender(RenderManager rm) {
-        // Renderizado del juego
+        // Código de renderización, si es necesario
     }
 }
+

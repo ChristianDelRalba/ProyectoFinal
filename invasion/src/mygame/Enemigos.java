@@ -1,11 +1,9 @@
 package mygame;
 
 import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.shape.Sphere;
-import com.jme3.texture.Texture;
+import com.jme3.scene.Spatial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +19,7 @@ public class Enemigos {
     private float timeSinceLastSpawn = 0f;
     private final int maxEnemigos = 5;
     private final Vector3f[] spawnPositions;
-    private final Map<Geometry, Integer> impactosEnemigos;
+    private final Map<Spatial, Integer> impactosEnemigos;
 
     public Enemigos(Main app) {
         this.app = app;
@@ -45,30 +43,20 @@ public class Enemigos {
         }
 
         // Actualiza la posición de los enemigos para que se muevan hacia el jugador
-        for (Geometry enemigo : enemigos) {
+        for (Spatial enemigo : enemigos) {
             Vector3f direction = playerPosition.subtract(enemigo.getLocalTranslation()).normalize();
             enemigo.move(direction.mult(tpf * 2f)); // Velocidad del enemigo
         }
     }
 
     private void spawnEnemigo() {
-        // Crea un nuevo enemigo
-        Sphere sphere = new Sphere(16, 16, 0.5f);
-        Geometry enemigo = new Geometry("Enemigo", sphere);
-        Material mat = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        try {
-            Texture tex = app.getAssetManager().loadTexture("Textures/enemigo.jpg");
-            mat.setTexture("ColorMap", tex);
-        } catch (Exception e) {
-            System.out.println("Error loading texture: " + e.getMessage());
-            mat.setColor("Color", ColorRGBA.Red);
-        }
-        enemigo.setMaterial(mat);
+        // Carga un nuevo modelo de enemigo
+        Spatial enemigo = app.getAssetManager().loadModel("Models/Enemigo/Enemigo.j3o");
 
         Vector3f spawnPosition = spawnPositions[random.nextInt(spawnPositions.length)];
         enemigo.setLocalTranslation(spawnPosition);
         app.getRootNode().attachChild(enemigo);
-        enemigos.add(enemigo);
+        enemigos.add((Geometry) enemigo); // Cambiado a Geometry
         impactosEnemigos.put(enemigo, 0);
     }
 
@@ -76,7 +64,7 @@ public class Enemigos {
         return enemigos;
     }
 
-    public void hitEnemigo(Geometry enemigo) {
+    public void hitEnemigo(Spatial enemigo) {
         // Maneja el impacto de un enemigo
         int impactos = impactosEnemigos.getOrDefault(enemigo, 0);
         impactos++;
